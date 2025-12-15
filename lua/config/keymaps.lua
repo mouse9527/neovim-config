@@ -22,13 +22,34 @@ vim.keymap.set("n", "<leader>tb", function()
   })
 end, { desc = "Toggle terminal (bottom)" })
 
--- Toggle Claude CLI
-vim.keymap.set("n", "<leader>tc", function()
-  Snacks.terminal("claude --dangerously-skip-permissions", {
-    win = { position = "bottom", height = 0.4 },
+-- Claude CLI 终端配置
+local claude_term = nil
+local claude_height = 0.4
+
+-- Toggle Claude CLI (可收起/展开)
+vim.keymap.set({ "n", "t" }, "<leader>tc", function()
+  claude_term = Snacks.terminal("claude --dangerously-skip-permissions", {
+    win = { position = "bottom", height = claude_height },
     keys = {
       term_normal = false, -- 禁用 <esc> 退出终端模式
       term_hide = false, -- 禁用 <esc><esc> 隐藏终端
     },
   })
 end, { desc = "Toggle Claude CLI" })
+
+-- Claude 终端全屏/恢复 (在 normal 和 terminal 模式下都可用)
+vim.keymap.set({ "n", "t" }, "<leader>tz", function()
+  if claude_term and claude_term:valid() then
+    -- 切换高度：0.4 <-> 0.95 (接近全屏)
+    if claude_height < 0.9 then
+      claude_height = 0.95
+    else
+      claude_height = 0.4
+    end
+    -- 重新调整窗口大小
+    local win = claude_term.win
+    if win then
+      vim.api.nvim_win_set_height(win, math.floor(vim.o.lines * claude_height))
+    end
+  end
+end, { desc = "Toggle Claude terminal fullscreen" })
