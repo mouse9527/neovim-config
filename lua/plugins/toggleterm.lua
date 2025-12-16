@@ -9,6 +9,8 @@ return {
         return vim.o.lines * 0.3
       elseif term.direction == "vertical" then
         return vim.o.columns * 0.4
+      else
+        return 20
       end
     end,
     shade_terminals = false,
