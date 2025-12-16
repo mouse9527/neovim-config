@@ -1,6 +1,9 @@
 return {
   {
     "folke/snacks.nvim",
+    keys = {
+      { "<leader>fp", function() Snacks.picker.projects() end, desc = "Projects" },
+    },
     opts = {
       -- 禁用 snacks terminal，使用 toggleterm
       terminal = { enabled = false },
@@ -23,6 +26,10 @@ return {
           },
           -- explorer 默认 normal mode
           explorer = {
+            focus = "list",
+          },
+          -- projects 默认 normal mode
+          projects = {
             focus = "list",
           },
         },
