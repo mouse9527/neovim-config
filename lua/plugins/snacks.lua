@@ -32,6 +32,10 @@ return {
           projects = {
             focus = "list",
           },
+          -- recent files 默认 normal mode
+          recent = {
+            focus = "list",
+          },
         },
       },
     },
