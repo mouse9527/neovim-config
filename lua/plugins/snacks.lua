@@ -36,6 +36,10 @@ return {
           recent = {
             focus = "list",
           },
+          -- lsp implementations 默认 normal mode
+          lsp_implementations = {
+            focus = "list",
+          },
         },
       },
     },
