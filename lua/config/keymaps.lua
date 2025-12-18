@@ -27,17 +27,37 @@ local function send_to_claude_modules()
     local start_line = math.min(l1, l2)
     local end_line = math.max(l1, l2)
     suffix = "#L" .. start_line .. "-" .. end_line
+    -- 退出 visual 模式
+    vim.api.nvim_feedkeys(vim.api.nvim_replace_termcodes("<Esc>", true, false, true), "n", false)
+  end
+
+  -- 计算相对于 pwd 的路径
+  local cwd = vim.fn.getcwd()
+  local prefix = cwd .. "/"
+  local relative_path
+  if file_path:sub(1, #prefix) == prefix then
+    relative_path = file_path:sub(#prefix + 1)
+  else
+    relative_path = file_path
   end
 
   for _, buf in ipairs(vim.api.nvim_list_bufs()) do
     if vim.bo[buf].buftype == "terminal" then
       local chan = vim.b[buf].terminal_job_id
       if chan then
-        vim.api.nvim_chan_send(
-          chan,
-          "@modules" .. file_path .. suffix .. "\n"
-        )
-        vim.notify("Sent to Claude:\n@modules" .. file_path .. suffix)
+        local content = " @" .. relative_path .. suffix .. " "
+        vim.api.nvim_chan_send(chan, content)
+        vim.notify("Sent to Claude:\n" .. content)
+
+        -- 跳转到终端窗口并保持 normal 模式
+        for _, win in ipairs(vim.api.nvim_list_wins()) do
+          if vim.api.nvim_win_get_buf(win) == buf then
+            vim.api.nvim_set_current_win(win)
+            vim.cmd("stopinsert")
+            break
+          end
+        end
+
         return
       end
     end
